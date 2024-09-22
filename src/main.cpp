@@ -3,6 +3,17 @@
 
 #include <iostream>
 
+int g_windowSizeX = 640;
+int g_windowSizeY = 360;
+
+void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
+{
+    g_windowSizeX = width;
+    g_windowSizeY = height;
+
+    glViewport(0, 0, g_windowSizeX, g_windowSizeY);
+}
+
 int main(void)
 {
     /* Initialize the library */
@@ -17,13 +28,15 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(g_windowSizeX, g_windowSizeY, "Hello World", NULL, NULL);
     if (!window)
     {
         std::cerr << "Failed to create window!\n";
         glfwTerminate();
         return -1;
     }
+
+    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -45,6 +58,8 @@ int main(void)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
