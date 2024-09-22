@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <cmath>
 
 int g_windowSizeX = 640;
 int g_windowSizeY = 360;
