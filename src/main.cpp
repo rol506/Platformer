@@ -3,11 +3,10 @@
 
 #include <iostream>
 #include <cmath>
+#include <chrono>
 
 int g_windowSizeX = 640;
 int g_windowSizeY = 360;
-
-unsigned int FPSRestriction = 0; //Set this to 0 will disable fps restriction
 
 GLfloat vertecies[] = {
     // X      Y     Z     R     G     B
@@ -130,41 +129,54 @@ int main(void)
         double lastTime = glfwGetTime();
         int nbFrames = 0;
 
+        //timing
+        auto frameLastTime = std::chrono::high_resolution_clock::now();
+        double frameDeltaTime = 0.f;
+        
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
+            //timing
+            auto timeNow = std::chrono::high_resolution_clock::now();
+            frameDeltaTime = std::chrono::duration<double, std::milli>(timeNow - frameLastTime).count();
+            frameLastTime = timeNow;
+
             //FPS counter
             double currentTime = glfwGetTime();
             if (currentTime - lastTime >= 1.0)
             {
-                //print fps and reset timer
+                //print fps and reset counter
                 std::cout << "FPS: " << nbFrames << "\n";
                 nbFrames = 0;
                 lastTime += 1.0f;
             }
 
-            if (nbFrames < FPSRestriction || FPSRestriction == 0)
-            {
-                nbFrames++;
+#pragma region physicsAndInput
 
-                /* Render here */
-                glClear(GL_COLOR_BUFFER_BIT);
-
-                timer = sin(glfwGetTime()) / 2.0f + 0.5f;
-                glUniform1f(glGetUniformLocation(shader, "timer"), timer);
-
-                glBindVertexArray(VAO);
-                glUseProgram(shader);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-            }
+            timer = sin(glfwGetTime()) / 2.0f + 0.5f;
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
+#pragma endregion
+
+#pragma region render
+
+            nbFrames++;
+
+            glUniform1f(glGetUniformLocation(shader, "timer"), timer);
+
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            glBindVertexArray(VAO);
+            glUseProgram(shader);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
+
+#pragma endregion
 
             /* Poll for and process events */
             glfwPollEvents();
