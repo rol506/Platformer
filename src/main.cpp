@@ -5,6 +5,8 @@
 #include <cmath>
 #include <chrono>
 
+#include "Renderer/ShaderProgram.h"
+
 int g_windowSizeX = 640;
 int g_windowSizeY = 360;
 
@@ -89,23 +91,6 @@ int main(void)
 
     {
 
-        GLuint vertex, fragment;
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vertexSource, nullptr);
-        glCompileShader(vertex);
-
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fragmentSource, nullptr);
-        glCompileShader(fragment);
-
-        GLuint shader = glCreateProgram();
-        glAttachShader(shader, vertex);
-        glAttachShader(shader, fragment);
-        glLinkProgram(shader);
-
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
-
         GLuint VBO, EBO, VAO;
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -123,7 +108,9 @@ int main(void)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        float timer;
+        RenderEngine::ShaderProgram program(vertexSource, fragmentSource);
+
+        float timer = 0.f;
 
         //for FPS counter
         double lastTime = glfwGetTime();
@@ -164,12 +151,13 @@ int main(void)
 
             nbFrames++;
 
-            glUniform1f(glGetUniformLocation(shader, "timer"), timer);
+            program.use();
+            program.setFloat(timer, "timer");
 
             glClear(GL_COLOR_BUFFER_BIT);
 
             glBindVertexArray(VAO);
-            glUseProgram(shader);
+            //program.use(); //you should use this but I will not because I used it earlier
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

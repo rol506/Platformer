@@ -5,6 +5,9 @@ project(${PROJECT_NAME} VERSION 1.0)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+
+    src/Renderer/ShaderProgram.cpp
+    src/Renderer/ShaderProgram.h
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
