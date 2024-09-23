@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <chrono>
+#include <memory>
 
 #include "Renderer/ShaderProgram.h"
 
@@ -108,7 +109,7 @@ int main(void)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        RenderEngine::ShaderProgram program(vertexSource, fragmentSource);
+        auto program = std::make_shared<RenderEngine::ShaderProgram>(vertexSource, fragmentSource);
 
         float timer = 0.f;
 
@@ -151,8 +152,8 @@ int main(void)
 
             nbFrames++;
 
-            program.use();
-            program.setFloat(timer, "timer");
+            program->use();
+            program->setFloat(timer, "timer");
 
             glClear(GL_COLOR_BUFFER_BIT);
 
