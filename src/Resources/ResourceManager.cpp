@@ -4,9 +4,14 @@
 #include <sstream>
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "../Renderer/ShaderProgram.h"
+#include "../Renderer/Texture2D.h"
 
 ResourceManager::ShaderProgramsMap ResourceManager::m_shaderPrograms;
+ResourceManager::TexturesMap ResourceManager::m_textures;
 std::string ResourceManager::m_path;
 
 void ResourceManager::setExecutablePath(const std::string& exectablePath)
@@ -18,6 +23,7 @@ void ResourceManager::setExecutablePath(const std::string& exectablePath)
 void ResourceManager::unloadAllResources()
 {
 	m_shaderPrograms.clear();
+	m_textures.clear();
 }
 
 std::string ResourceManager::getFileString(const std::string& relativeFilePath)
@@ -74,5 +80,38 @@ std::shared_ptr<RenderEngine::ShaderProgram> ResourceManager::getShaderProgram(c
 	}
 
 	std::cerr << "Can't find shader program: " << shaderName << "\n";
+	return nullptr;
+}
+
+std::shared_ptr<RenderEngine::Texture2D> ResourceManager::loadTexture(const std::string& textureName, const std::string& texturePath, const GLenum filter, const GLenum wrapMode)
+{
+	int channels = 0;
+	int width = 0;
+	int height = 0;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* data = stbi_load(std::string(m_path + "/" + texturePath).c_str(), &width, &height, &channels, 0);
+
+	if (!data)
+	{
+		std::cerr << "Failed to open texture: " << texturePath << "\n";
+		return nullptr;
+	}
+
+	std::shared_ptr<RenderEngine::Texture2D> newTexture = m_textures.emplace(textureName,
+		std::make_shared<RenderEngine::Texture2D>(width, height, channels, data, filter, wrapMode)).first->second;
+
+	stbi_image_free(data);
+	return newTexture;
+}
+
+std::shared_ptr<RenderEngine::Texture2D> ResourceManager::getTexture(const std::string& textureName)
+{
+	TexturesMap::const_iterator it = m_textures.find(textureName);
+	if (it != m_textures.end())
+	{
+		return it->second;
+	}
+
+	std::cerr << "Can't find texture: " << textureName << "\n";
 	return nullptr;
 }

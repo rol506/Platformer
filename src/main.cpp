@@ -7,17 +7,18 @@
 #include <memory>
 
 #include "Renderer/ShaderProgram.h"
+#include "Renderer/Texture2D.h"
 #include "Resources/ResourceManager.h"
 
 int g_windowSizeX = 640;
 int g_windowSizeY = 360;
 
 GLfloat vertecies[] = {
-    // X      Y     Z     R     G     B
-     -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,      //    1 --- 4
-     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,      //    | \   |
-      0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,      //    |   \ |
-      0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f       //    2 --- 3
+    // X      Y     Z     R     G     B     TX    TY
+     -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,      //    1 --- 4
+     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,      //    | \   |
+      0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,      //    |   \ |
+      0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f       //    2 --- 3
 };
 
 unsigned int elements[] = {
@@ -86,12 +87,15 @@ int main(int argc, char** argv)
         glGenVertexArrays(1, &VAO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
         auto program = ResourceManager::loadShaders("DefaultShader", "res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+        auto texture = ResourceManager::loadTexture("DefaultTexture", "res/textures/texture.jpg", GL_NEAREST, GL_REPEAT);
 
         float timer = 0.f;
 
@@ -102,6 +106,9 @@ int main(int argc, char** argv)
         //timing
         auto frameLastTime = std::chrono::high_resolution_clock::now();
         double frameDeltaTime = 0.f;
+
+        program->use();
+        program->setInt(0, "tex");
         
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         /* Loop until the user closes the window */
@@ -140,6 +147,7 @@ int main(int argc, char** argv)
             glClear(GL_COLOR_BUFFER_BIT);
 
             glBindVertexArray(VAO);
+            texture->bind();
             //program.use(); //you should use this but I will not because I used it earlier
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

@@ -65,12 +65,17 @@ namespace RenderEngine
 		glUseProgram(m_ID);
 	}
 
-	void ShaderProgram::setFloat(float value, const std::string& name) const
+	void ShaderProgram::setFloat(const float value, const std::string& name) const
 	{
 		glUniform1f(glGetUniformLocation(m_ID, name.c_str()), value);
 	}
 
-	ShaderProgram::ShaderProgram(ShaderProgram&& shader)
+	void ShaderProgram::setInt(const int value, const std::string& name) const
+	{
+		glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+	}
+
+	ShaderProgram::ShaderProgram(ShaderProgram&& shader) noexcept
 	{
 		m_ID = shader.m_ID;
 		m_isCompiled = shader.m_isCompiled;
@@ -79,7 +84,7 @@ namespace RenderEngine
 		shader.m_isCompiled = false;
 	}
 
-	ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shader)
+	ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shader) noexcept
 	{
 		if (this != &shader)
 		{

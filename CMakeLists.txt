@@ -8,9 +8,12 @@ add_executable(${PROJECT_NAME}
 
     src/Renderer/ShaderProgram.cpp
     src/Renderer/ShaderProgram.h
+    src/Renderer/Texture2D.cpp
+    src/Renderer/Texture2D.h
 
     src/Resources/ResourceManager.cpp
     src/Resources/ResourceManager.h
+    src/Resources/stb_image.h
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
