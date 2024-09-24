@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Renderer/ShaderProgram.h"
+#include "Resources/ResourceManager.h"
 
 int g_windowSizeX = 640;
 int g_windowSizeY = 360;
@@ -24,27 +25,6 @@ unsigned int elements[] = {
     0, 2, 3
 };
 
-const char* vertexSource =
-"#version 330 core\n;"
-"layout(location=0) in vec3 vertexPosition;"
-"layout(location=1) in vec3 vertexColor;"
-"out vec3 Color;"
-"void main()"
-"{"
-"gl_Position = vec4(vertexPosition, 1.0);"
-"Color = vertexColor;"
-"}";
-
-const char* fragmentSource =
-"#version 330 core\n"
-"in vec3 Color;"
-"out vec4 OutColor;"
-"uniform float timer;"
-"void main()"
-"{"
-"OutColor = vec4(Color.xy, timer, 1.0);"
-"}";
-
 void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     g_windowSizeX = width;
@@ -53,8 +33,10 @@ void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
     glViewport(0, 0, g_windowSizeX, g_windowSizeY);
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
+    ResourceManager::setExecutablePath(argv[0]);
+
     /* Initialize the library */
     if (!glfwInit())
     {
@@ -109,7 +91,7 @@ int main(void)
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        auto program = std::make_shared<RenderEngine::ShaderProgram>(vertexSource, fragmentSource);
+        auto program = ResourceManager::loadShaders("DefaultShader", "res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
 
         float timer = 0.f;
 
@@ -171,6 +153,7 @@ int main(void)
             glfwPollEvents();
         }
 
+        ResourceManager::unloadAllResources();
         glfwTerminate();
         return 0;
     }
