@@ -5,6 +5,7 @@
 #include <cmath>
 #include <chrono>
 #include <memory>
+#include <cstring>
 
 #include "Renderer/ShaderProgram.h"
 #include "Renderer/Texture2D.h"
