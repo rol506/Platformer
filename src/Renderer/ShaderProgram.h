@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 
 #include <string>
+#include <glm/mat4x4.hpp>
 
 namespace RenderEngine {
 
@@ -27,6 +28,7 @@ namespace RenderEngine {
 
 		void setFloat(const float value, const std::string& name) const;
 		void setInt(const int value, const std::string& name) const;
+		void setMat4(const glm::mat4& matrix, const std::string& name) const;
 
 	private:
 

@@ -1,6 +1,7 @@
 #include "ShaderProgram.h"
 
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace RenderEngine 
 {
@@ -73,6 +74,11 @@ namespace RenderEngine
 	void ShaderProgram::setInt(const int value, const std::string& name) const
 	{
 		glUniform1i(glGetUniformLocation(m_ID, name.c_str()), value);
+	}
+
+	void ShaderProgram::setMat4(const glm::mat4& matrix, const std::string& name) const
+	{
+		glUniformMatrix4fv(glGetUniformLocation(m_ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 
 	ShaderProgram::ShaderProgram(ShaderProgram&& shader) noexcept

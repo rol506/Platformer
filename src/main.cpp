@@ -10,15 +10,18 @@
 #include "Renderer/Texture2D.h"
 #include "Resources/ResourceManager.h"
 
-int g_windowSizeX = 640;
-int g_windowSizeY = 360;
+#include <glm/vec2.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+glm::ivec2 gWindowSize(640, 360);
 
 GLfloat vertecies[] = {
-    // X      Y     Z     R     G     B     TX    TY
-     -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,      //    1 --- 4
-     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,      //    | \   |
-      0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,      //    |   \ |
-      0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f       //    2 --- 3
+    // X         Y     Z     R     G     B     TX    TY
+     -85.0f,   60.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,      //    1 --- 4
+     -85.0f,  -60.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,      //    | \   |
+      85.0f,  -60.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,      //    |   \ |
+      85.0f,   60.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f       //    2 --- 3
 };
 
 unsigned int elements[] = {
@@ -28,15 +31,24 @@ unsigned int elements[] = {
 
 void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
-    g_windowSizeX = width;
-    g_windowSizeY = height;
+    gWindowSize.x = width;
+    gWindowSize.y = height;
 
-    glViewport(0, 0, g_windowSizeX, g_windowSizeY);
+    glViewport(0, 0, gWindowSize.x, gWindowSize.y);
 }
 
 int main(int argc, char** argv)
 {
+    bool displayFPS = true;
+
     ResourceManager::setExecutablePath(argv[0]);
+    for (int i = 0; i < argc; ++i)
+    {
+        if (strcmp(argv[i], "--NOFPS") == 0)
+        {
+            displayFPS = false;
+        }
+    }
 
     /* Initialize the library */
     if (!glfwInit())
@@ -50,7 +62,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* window = glfwCreateWindow(g_windowSizeX, g_windowSizeY, "Hello World", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(gWindowSize.x, gWindowSize.y, "Hello World", NULL, NULL);
     if (!window)
     {
         std::cerr << "Failed to create window!\n";
@@ -107,8 +119,14 @@ int main(int argc, char** argv)
         auto frameLastTime = std::chrono::high_resolution_clock::now();
         double frameDeltaTime = 0.f;
 
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(gWindowSize.x/2, gWindowSize.y/2, 0.0f));
+        //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 1.0f));
+        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(gWindowSize.x), 0.0f, static_cast<float>(gWindowSize.y), -100.0f, 100.0f);
+
         program->use();
         program->setInt(0, "tex");
+        program->setMat4(projection, "projectionMat");
         
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         /* Loop until the user closes the window */
@@ -124,7 +142,8 @@ int main(int argc, char** argv)
             if (currentTime - lastTime >= 1.0)
             {
                 //print fps and reset counter
-                std::cout << "FPS: " << nbFrames << "\n";
+                if (displayFPS)
+                    std::cout << "FPS: " << nbFrames << "\n";
                 nbFrames = 0;
                 lastTime += 1.0f;
             }
@@ -135,6 +154,11 @@ int main(int argc, char** argv)
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.0f,   0.5f, 0.0f) * static_cast<float>(frameDeltaTime));
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.0f,  -0.5f, 0.0f) * static_cast<float>(frameDeltaTime));
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) model = glm::translate(model, glm::vec3(-0.5f,   0.0f, 0.0f) * static_cast<float>(frameDeltaTime));
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.5f,   0.0f, 0.0f) * static_cast<float>(frameDeltaTime));
+
 #pragma endregion
 
 #pragma region render
@@ -143,6 +167,7 @@ int main(int argc, char** argv)
 
             program->use();
             program->setFloat(timer, "timer");
+            program->setMat4(model, "modelMat");
 
             glClear(GL_COLOR_BUFFER_BIT);
 
