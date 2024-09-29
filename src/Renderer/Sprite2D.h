@@ -9,6 +9,7 @@
 #include <glm/vec2.hpp>
 
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 namespace RenderEngine
 {
@@ -32,9 +33,10 @@ namespace RenderEngine
 
 	private:
 
-		GLuint m_VAO, m_EBO;
+		GLuint m_VAO;
 
 		VertexBuffer m_vertexBuffer;
+		IndexBuffer m_indexBuffer;
 
 		std::shared_ptr<Texture2D> m_pTexture;
 		std::shared_ptr<ShaderProgram> m_pShaderProgram;

@@ -47,9 +47,7 @@ namespace RenderEngine
 
 		m_vertexBuffer.init(vertecies, sizeof(vertecies));
 
-		glGenBuffers(1, &m_EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		m_indexBuffer.init(indices, 6);
 
 		glGenVertexArrays(1, &m_VAO);
 		glBindVertexArray(m_VAO);
@@ -60,14 +58,13 @@ namespace RenderEngine
 		glEnableVertexAttribArray(1);
 
 		m_vertexBuffer.unbind();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		m_indexBuffer.unbind();
 		glBindVertexArray(0);
 	}
 
 	Sprite2D::~Sprite2D()
 	{
 		glDeleteVertexArrays(1, &m_VAO);
-		glDeleteBuffers(1, &m_EBO);
 	}
 
 	void Sprite2D::render(const glm::vec2& position, const glm::vec2& scale, const int layer, const float rotation) const
@@ -93,7 +90,7 @@ namespace RenderEngine
 		glBindVertexArray(m_VAO);
 		
 		m_vertexBuffer.bind();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+		m_indexBuffer.bind();
 
 		m_pShaderProgram->use();
 		
