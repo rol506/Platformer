@@ -132,6 +132,7 @@ int main(int argc, char** argv)
         shader->setMat4(projection, "projectionMatrix");
         
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
+        glEnable(GL_DEPTH_TEST);
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
@@ -173,10 +174,11 @@ int main(int argc, char** argv)
             shader->use();
             shader->setFloat(timer, "timer");
 
-            glClear(GL_COLOR_BUFFER_BIT);
-            sprite->render(copyPos, glm::vec2(1), 0, 0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             sprite->render(spritePos, glm::vec2(1), 0, 0);
+
+            sprite->render(copyPos, glm::vec2(1), -1, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
