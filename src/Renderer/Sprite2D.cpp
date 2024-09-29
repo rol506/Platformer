@@ -45,9 +45,7 @@ namespace RenderEngine
 			1, 3, 2
 		};
 
-		glGenBuffers(1, &m_VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertecies), vertecies, GL_STATIC_DRAW);
+		m_vertexBuffer.init(vertecies, sizeof(vertecies));
 
 		glGenBuffers(1, &m_EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
@@ -55,13 +53,13 @@ namespace RenderEngine
 
 		glGenVertexArrays(1, &m_VAO);
 		glBindVertexArray(m_VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		m_vertexBuffer.bind();
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		m_vertexBuffer.unbind();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
@@ -69,7 +67,6 @@ namespace RenderEngine
 	Sprite2D::~Sprite2D()
 	{
 		glDeleteVertexArrays(1, &m_VAO);
-		glDeleteBuffers(1, &m_VBO);
 		glDeleteBuffers(1, &m_EBO);
 	}
 
@@ -94,7 +91,8 @@ namespace RenderEngine
 		m_pTexture->bind();
 
 		glBindVertexArray(m_VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+		
+		m_vertexBuffer.bind();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 
 		m_pShaderProgram->use();

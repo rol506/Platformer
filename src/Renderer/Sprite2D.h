@@ -8,6 +8,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
+#include "VertexBuffer.h"
+
 namespace RenderEngine
 {
 	class ShaderProgram;
@@ -30,7 +32,9 @@ namespace RenderEngine
 
 	private:
 
-		GLuint m_VBO, m_VAO, m_EBO;
+		GLuint m_VAO, m_EBO;
+
+		VertexBuffer m_vertexBuffer;
 
 		std::shared_ptr<Texture2D> m_pTexture;
 		std::shared_ptr<ShaderProgram> m_pShaderProgram;
