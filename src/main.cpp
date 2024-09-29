@@ -18,19 +18,6 @@
 
 glm::ivec2 gWindowSize(640, 360); //640x360
 
-GLfloat vertecies[] = {
-    // X         Y     Z     R     G     B     TX    TY
-     -85.0f,   60.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,      //    1 --- 4
-     -85.0f,  -60.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,      //    | \   |
-      85.0f,  -60.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,      //    |   \ |
-      85.0f,   60.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f       //    2 --- 3
-};
-
-unsigned int elements[] = {
-    0, 1, 2,
-    0, 2, 3
-};
-
 void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     gWindowSize.x = width;
@@ -88,26 +75,6 @@ int main(int argc, char** argv)
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
 
     {
-
-        GLuint VBO, EBO, VAO;
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertecies), vertecies, GL_STATIC_DRAW);
-
-        glGenBuffers(1, &EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-
         auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
         auto texture = ResourceManager::loadTexture("Texture", "res/textures/lol.png");
         auto sprite = ResourceManager::loadSprite("Sprite", "SpriteShader", "Texture");
