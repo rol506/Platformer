@@ -9,9 +9,11 @@
 
 #include "../Renderer/ShaderProgram.h"
 #include "../Renderer/Texture2D.h"
+#include "../Renderer/Sprite2D.h"
 
 ResourceManager::ShaderProgramsMap ResourceManager::m_shaderPrograms;
 ResourceManager::TexturesMap ResourceManager::m_textures;
+ResourceManager::SpritesMap ResourceManager::m_sprites;
 std::string ResourceManager::m_path;
 
 void ResourceManager::setExecutablePath(const std::string& exectablePath)
@@ -24,6 +26,7 @@ void ResourceManager::unloadAllResources()
 {
 	m_shaderPrograms.clear();
 	m_textures.clear();
+	m_sprites.clear();
 }
 
 std::string ResourceManager::getFileString(const std::string& relativeFilePath)
@@ -88,7 +91,7 @@ std::shared_ptr<RenderEngine::Texture2D> ResourceManager::loadTexture(const std:
 	int channels = 0;
 	int width = 0;
 	int height = 0;
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 	unsigned char* data = stbi_load(std::string(m_path + "/" + texturePath).c_str(), &width, &height, &channels, 0);
 
 	if (!data)
@@ -113,5 +116,41 @@ std::shared_ptr<RenderEngine::Texture2D> ResourceManager::getTexture(const std::
 	}
 
 	std::cerr << "Can't find texture: " << textureName << "\n";
+	return nullptr;
+}
+
+std::shared_ptr<RenderEngine::Sprite2D> ResourceManager::loadSprite(const std::string& spriteName, const std::string& shaderName,
+	const std::string& textureName, const std::string& subTextureName)
+{
+	auto shader = getShaderProgram(shaderName);
+	if (!shader)
+	{
+		std::cerr << "Can't find shader program: " << shaderName << " for the sprite: " << spriteName << "\n";
+		return nullptr;
+	}
+
+	auto texture = getTexture(textureName);
+	if (!texture)
+	{
+		std::cerr << "Can't find texture: " << textureName << " for the sprite: " << spriteName << "\n";
+		return nullptr;
+	}
+
+	std::shared_ptr<RenderEngine::Sprite2D> newSprite = m_sprites.emplace(spriteName, std::make_shared<RenderEngine::Sprite2D>(
+		shader, texture, subTextureName
+	)).first->second;
+
+	return newSprite;
+}
+
+std::shared_ptr<RenderEngine::Sprite2D> ResourceManager::getSprite(const std::string& spriteName)
+{
+	auto it = m_sprites.find(spriteName);
+	if (it != m_sprites.end())
+	{
+		return it->second;
+	}
+
+	std::cerr << "Can't find the sprite: " << spriteName << "\n";
 	return nullptr;
 }

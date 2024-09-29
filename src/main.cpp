@@ -9,13 +9,14 @@
 
 #include "Renderer/ShaderProgram.h"
 #include "Renderer/Texture2D.h"
+#include "Renderer/Sprite2D.h"
 #include "Resources/ResourceManager.h"
 
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-glm::ivec2 gWindowSize(640, 360);
+glm::ivec2 gWindowSize(640, 360); //640x360
 
 GLfloat vertecies[] = {
     // X         Y     Z     R     G     B     TX    TY
@@ -107,8 +108,13 @@ int main(int argc, char** argv)
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
 
-        auto program = ResourceManager::loadShaders("DefaultShader", "res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
-        auto texture = ResourceManager::loadTexture("DefaultTexture", "res/textures/texture.jpg", GL_NEAREST, GL_REPEAT);
+        auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
+        auto texture = ResourceManager::loadTexture("Texture", "res/textures/lol.png");
+        auto sprite = ResourceManager::loadSprite("Sprite", "SpriteShader", "Texture");
+
+        glm::vec2 copyPos(-1000000);
+
+        glm::vec2 spritePos(gWindowSize.x/2-50, gWindowSize.y/2-50);
 
         float timer = 0.f;
 
@@ -120,14 +126,10 @@ int main(int argc, char** argv)
         auto frameLastTime = std::chrono::high_resolution_clock::now();
         double frameDeltaTime = 0.f;
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(gWindowSize.x/2, gWindowSize.y/2, 0.0f));
-        //model = glm::scale(model, glm::vec3(2.0f, 2.0f, 1.0f));
         glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(gWindowSize.x), 0.0f, static_cast<float>(gWindowSize.y), -100.0f, 100.0f);
 
-        program->use();
-        program->setInt(0, "tex");
-        program->setMat4(projection, "projectionMat");
+        shader->use();
+        shader->setMat4(projection, "projectionMatrix");
         
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         /* Loop until the user closes the window */
@@ -155,10 +157,12 @@ int main(int argc, char** argv)
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.0f,   0.5f, 0.0f) * static_cast<float>(frameDeltaTime));
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.0f,  -0.5f, 0.0f) * static_cast<float>(frameDeltaTime));
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) model = glm::translate(model, glm::vec3(-0.5f,   0.0f, 0.0f) * static_cast<float>(frameDeltaTime));
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) model = glm::translate(model, glm::vec3( 0.5f,   0.0f, 0.0f) * static_cast<float>(frameDeltaTime));
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.0f,  0.5f) * static_cast<float>(frameDeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.0f, -0.5f) * static_cast<float>(frameDeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)  spritePos = spritePos + glm::vec2(-0.5f,  0.0f) * static_cast<float>(frameDeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.5f,  0.0f) * static_cast<float>(frameDeltaTime);
+
+            if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) copyPos = spritePos;
 
 #pragma endregion
 
@@ -166,17 +170,13 @@ int main(int argc, char** argv)
 
             nbFrames++;
 
-            program->use();
-            program->setFloat(timer, "timer");
-            program->setMat4(model, "modelMat");
+            shader->use();
+            shader->setFloat(timer, "timer");
 
             glClear(GL_COLOR_BUFFER_BIT);
+            sprite->render(copyPos, glm::vec2(1), 0, 0);
 
-            glBindVertexArray(VAO);
-            texture->bind();
-            //program.use(); //you should use this but I will not because I used it earlier
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            sprite->render(spritePos, glm::vec2(1), 0, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
