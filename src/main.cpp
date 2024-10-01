@@ -18,7 +18,7 @@
 
 glm::ivec2 gWindowSize(640, 360); //640x360
 
-void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
+static void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     gWindowSize.x = width;
     gWindowSize.y = height;

@@ -16,11 +16,24 @@ add_executable(${PROJECT_NAME}
     src/Renderer/VertexBuffer.h
     src/Renderer/IndexBuffer.cpp
     src/Renderer/IndexBuffer.h
+    src/Renderer/VertexBufferLayout.cpp
+    src/Renderer/VertexBufferLayout.h
+    src/Renderer/VertexArray.cpp
+    src/Renderer/VertexArray.h
 
     src/Resources/ResourceManager.cpp
     src/Resources/ResourceManager.h
     src/Resources/stb_image.h
 )
+
+#debug
+if (WIN32)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} /fsanitize=address")
+    message("\nBUILDING IN DEBUG MODE FOR WINDOWS\n")
+elseif(UNIX)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -fsanitize=address")
+    message("\nBUILDING IN DEBUG MODE FOR UNIX\n")
+endif()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 

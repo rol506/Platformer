@@ -10,6 +10,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 namespace RenderEngine
 {
@@ -33,8 +34,7 @@ namespace RenderEngine
 
 	private:
 
-		GLuint m_VAO;
-
+		VertexArray m_vertexArray;
 		VertexBuffer m_vertexBuffer;
 		IndexBuffer m_indexBuffer;
 

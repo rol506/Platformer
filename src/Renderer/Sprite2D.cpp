@@ -11,7 +11,7 @@ namespace RenderEngine
 	Sprite2D::Sprite2D(std::shared_ptr<ShaderProgram> pShaderProgram, std::shared_ptr<Texture2D> pTexture, std::string initialSubTexture)
 		: m_pShaderProgram(pShaderProgram), m_pTexture(pTexture)
 	{
-		auto subTexture = m_pTexture->getSubTexture(initialSubTexture);
+		auto& subTexture = m_pTexture->getSubTexture(initialSubTexture);
 
 		const float vertecies[] =
 		{
@@ -49,23 +49,19 @@ namespace RenderEngine
 
 		m_indexBuffer.init(indices, 6);
 
-		glGenVertexArrays(1, &m_VAO);
-		glBindVertexArray(m_VAO);
-		m_vertexBuffer.bind();
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-		glEnableVertexAttribArray(1);
+		VertexBufferLayout layout;
+		layout.addElementLayoutFloat(2, false);
+		layout.addElementLayoutFloat(2, false);
+
+		m_vertexArray.addBuffer(m_vertexBuffer, layout);
 
 		m_vertexBuffer.unbind();
 		m_indexBuffer.unbind();
-		glBindVertexArray(0);
+		m_vertexArray.unbind();
 	}
 
 	Sprite2D::~Sprite2D()
-	{
-		glDeleteVertexArrays(1, &m_VAO);
-	}
+	{}
 
 	void Sprite2D::render(const glm::vec2& position, const glm::vec2& scale, const int layer, const float rotation) const
 	{
@@ -87,7 +83,7 @@ namespace RenderEngine
 		glActiveTexture(GL_TEXTURE0);
 		m_pTexture->bind();
 
-		glBindVertexArray(m_VAO);
+		m_vertexArray.bind();
 		
 		m_vertexBuffer.bind();
 		m_indexBuffer.bind();
