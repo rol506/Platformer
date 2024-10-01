@@ -10,6 +10,7 @@
 #include "Renderer/ShaderProgram.h"
 #include "Renderer/Texture2D.h"
 #include "Renderer/Sprite2D.h"
+#include "Renderer/Renderer.h"
 #include "Resources/ResourceManager.h"
 
 #include <glm/vec2.hpp>
@@ -23,7 +24,7 @@ static void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
     gWindowSize.x = width;
     gWindowSize.y = height;
 
-    glViewport(0, 0, gWindowSize.x, gWindowSize.y);
+    RenderEngine::Renderer::setVieport(gWindowSize.x, gWindowSize.y, 0, 0);
 }
 
 int main(int argc, char** argv)
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* window = glfwCreateWindow(gWindowSize.x, gWindowSize.y, "Platformer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(gWindowSize.x, gWindowSize.y, "Platformer", nullptr, nullptr);
     if (!window)
     {
         std::cerr << "Failed to create window!\n";
@@ -71,8 +72,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
-    std::cout << "OpenGL version: " << glGetString(GL_VERSION) << "\n";
+    std::cout << "Renderer: " << RenderEngine::Renderer::getRendererStr() << "\n";
+    std::cout << "OpenGL version: " << RenderEngine::Renderer::getVersionStr() << "\n";
 
     {
         auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
@@ -98,8 +99,8 @@ int main(int argc, char** argv)
         shader->use();
         shader->setMat4(projection, "projectionMatrix");
 
-        glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
-        glEnable(GL_DEPTH_TEST);
+        RenderEngine::Renderer::setClearColor(0.5f, 1.0f, 1.0f, 1.0f);
+        RenderEngine::Renderer::setDepthTest(true);
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
@@ -141,7 +142,7 @@ int main(int argc, char** argv)
             shader->use();
             shader->setFloat(timer, "timer");
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            RenderEngine::Renderer::clear();
 
             sprite->render(spritePos, glm::vec2(1), 0, 0);
 

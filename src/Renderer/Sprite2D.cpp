@@ -2,6 +2,7 @@
 
 #include "Texture2D.h"
 #include "ShaderProgram.h"
+#include "Renderer.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -83,15 +84,6 @@ namespace RenderEngine
 		glActiveTexture(GL_TEXTURE0);
 		m_pTexture->bind();
 
-		m_vertexArray.bind();
-		
-		m_vertexBuffer.bind();
-		m_indexBuffer.bind();
-
-		m_pShaderProgram->use();
-		
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		Renderer::draw(m_vertexArray, m_indexBuffer, *m_pShaderProgram);
 	}
 }
