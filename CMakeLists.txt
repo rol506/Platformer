@@ -28,10 +28,10 @@ add_executable(${PROJECT_NAME}
 
 #debug
 if (WIN32)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} /fsanitize=address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fsanitize=address")
     message("\nBUILDING IN DEBUG MODE FOR WINDOWS\n")
 elseif(UNIX)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -fsanitize=address")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
     message("\nBUILDING IN DEBUG MODE FOR UNIX\n")
 endif()
 

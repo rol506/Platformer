@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* window = glfwCreateWindow(gWindowSize.x, gWindowSize.y, "Hello World", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(gWindowSize.x, gWindowSize.y, "Platformer", NULL, NULL);
     if (!window)
     {
         std::cerr << "Failed to create window!\n";
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
         glm::vec2 copyPos(-1000000);
 
-        glm::vec2 spritePos(gWindowSize.x/2-50, gWindowSize.y/2-50);
+        glm::vec2 spritePos(gWindowSize.x / 2 - 50, gWindowSize.y / 2 - 50);
 
         float timer = 0.f;
 
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
         shader->use();
         shader->setMat4(projection, "projectionMatrix");
-        
+
         glClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         /* Loop until the user closes the window */
