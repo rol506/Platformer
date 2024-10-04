@@ -18,7 +18,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 glm::ivec2 gWindowSize(640, 360); //640x360
-
 static void glfwWindowSizeCallback(GLFWwindow* pWindow, int width, int height)
 {
     gWindowSize.x = width;
@@ -77,14 +76,15 @@ int main(int argc, char** argv)
 
     {
         auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
-        auto texture = ResourceManager::loadTexture("Texture", "res/textures/lol.png");
-        auto sprite = ResourceManager::loadSprite("Sprite", "SpriteShader", "Texture");
+        //auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSpriteLine.glsl", "res/shaders/fSpriteLine.glsl");
+        auto texture = ResourceManager::loadTexture("PlayerTexture", "res/textures/lol.png", GL_LINEAR, GL_REPEAT);
+        auto player = ResourceManager::loadSprite("Player", "SpriteShader", "PlayerTexture");
 
-        glm::vec2 copyPos(-1000000);
+        glm::mat4 projection = glm::ortho(0.0f, 1.0f * gWindowSize.x, 0.0f, 1.0f * gWindowSize.y, -10.0f, 10.0f);
+        shader->use();
+        shader->setMat4(projection, "projectionMatrix");
 
-        glm::vec2 spritePos(gWindowSize.x / 2 - 50, gWindowSize.y / 2 - 50);
-
-        float timer = 0.f;
+        glm::vec2 playerPosition(gWindowSize / 2);
 
         //for FPS counter
         double lastTime = glfwGetTime();
@@ -93,11 +93,6 @@ int main(int argc, char** argv)
         //timing
         auto frameLastTime = std::chrono::high_resolution_clock::now();
         double frameDeltaTime = 0.f;
-
-        glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(gWindowSize.x), 0.0f, static_cast<float>(gWindowSize.y), -100.0f, 100.0f);
-
-        shader->use();
-        shader->setMat4(projection, "projectionMatrix");
 
         RenderEngine::Renderer::setClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         RenderEngine::Renderer::setDepthTest(true);
@@ -122,16 +117,12 @@ int main(int argc, char** argv)
 
 #pragma region physicsAndInput
 
-            timer = sin(glfwGetTime()) / 2.0f + 0.5f;
-
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.0f,  0.5f) * static_cast<float>(frameDeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.0f, -0.5f) * static_cast<float>(frameDeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)  spritePos = spritePos + glm::vec2(-0.5f,  0.0f) * static_cast<float>(frameDeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)  spritePos = spritePos + glm::vec2( 0.5f,  0.0f) * static_cast<float>(frameDeltaTime);
-
-            if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) copyPos = spritePos;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) playerPosition += glm::vec2(0.f, 0.5f * frameDeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) playerPosition += glm::vec2(0.f, -0.5f * frameDeltaTime);
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) playerPosition += glm::vec2(-0.5f * frameDeltaTime, 0.f);
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) playerPosition += glm::vec2(0.5f * frameDeltaTime, 0.f);
 
 #pragma endregion
 
@@ -139,14 +130,16 @@ int main(int argc, char** argv)
 
             nbFrames++;
 
-            shader->use();
-            shader->setFloat(timer, "timer");
-
             RenderEngine::Renderer::clear();
 
-            sprite->render(spritePos, glm::vec2(1), 0, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            shader->setInt(0, "outline");
+            player->render(playerPosition-glm::vec2(50.0f), glm::vec2(1.0f), 0, 0);
 
-            sprite->render(copyPos, glm::vec2(1), -1, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            shader->setInt(1, "outline");
+            player->render(playerPosition - glm::vec2(50.0f), glm::vec2(1.0f), 1, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
