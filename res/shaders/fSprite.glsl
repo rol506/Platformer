@@ -4,6 +4,7 @@ in vec2 texCoord;
 
 uniform sampler2D tex;
 uniform int outline;
+uniform int test;
 
 out vec4 OutColor;
 
@@ -14,6 +15,11 @@ void main()
 		OutColor = vec4(0.0, 0.0, 0.0, 1.0);
 	} else {
 		OutColor = texture(tex, texCoord);
+	}
+	
+	if (test == 1)
+	{
+		OutColor = vec4(1.0, 0.0, 0.0, 1.0);
 	}
 	
 	if (OutColor.rgb == vec3(0.0) && outline != 1)

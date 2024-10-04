@@ -11,7 +11,10 @@
 #include "Renderer/Texture2D.h"
 #include "Renderer/Sprite2D.h"
 #include "Renderer/Renderer.h"
+
 #include "Resources/ResourceManager.h"
+
+#include "Physics/PhysicsEngine.h"
 
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
@@ -76,7 +79,6 @@ int main(int argc, char** argv)
 
     {
         auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
-        //auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSpriteLine.glsl", "res/shaders/fSpriteLine.glsl");
         auto texture = ResourceManager::loadTexture("PlayerTexture", "res/textures/lol.png", GL_LINEAR, GL_REPEAT);
         auto player = ResourceManager::loadSprite("Player", "SpriteShader", "PlayerTexture");
 
@@ -124,6 +126,19 @@ int main(int argc, char** argv)
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) playerPosition += glm::vec2(-0.5f * frameDeltaTime, 0.f);
             if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) playerPosition += glm::vec2(0.5f * frameDeltaTime, 0.f);
 
+            double xpos, ypos;
+            glfwGetCursorPos(window, &xpos, &ypos);
+            ypos = -(ypos - gWindowSize.y); //invert y position
+
+            if (RectVsRect({ playerPosition, playerPosition + glm::vec2(100.0f) }, { gWindowSize/2, glm::vec2(gWindowSize.x/2, gWindowSize.y/2) + glm::vec2(100.0f)}))
+            {
+                shader->setInt(1, "test");
+            }
+            else
+            {
+                shader->setInt(0, "test");
+            }
+
 #pragma endregion
 
 #pragma region render
@@ -135,11 +150,22 @@ int main(int argc, char** argv)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             shader->setInt(0, "outline");
-            player->render(playerPosition-glm::vec2(50.0f), glm::vec2(1.0f), 0, 0);
+            player->render(playerPosition, glm::vec2(1.0f), 0, 0);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             shader->setInt(1, "outline");
-            player->render(playerPosition - glm::vec2(50.0f), glm::vec2(1.0f), 1, 0);
+            player->render(playerPosition, glm::vec2(1.0f), 1, 0);
+
+
+            //draw another rect
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            shader->setInt(0, "outline");
+            player->render(gWindowSize/2, glm::vec2(1.0f), 0, 0);
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            shader->setInt(1, "outline");
+            player->render(gWindowSize/2, glm::vec2(1.0f), 1, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
