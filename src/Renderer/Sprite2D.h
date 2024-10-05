@@ -32,10 +32,10 @@ namespace RenderEngine
 
 		void render(const glm::vec2& position, const glm::vec2& scale, const int layer, const float rotation) const;
 
-		void setTargetPosition(glm::vec2& targetPosition);
-		void setPosition(glm::vec2& position);
-		void addVelocity(glm::vec2& velocity);
-		void setSize(glm::vec2& size);
+		void setTargetPosition(const glm::vec2& targetPosition);
+		void setPosition(const glm::vec2& position);
+		void addVelocity(const glm::vec2& velocity);
+		void setSize(const glm::vec2& size);
 		glm::vec2 getPosition() const { return m_position; }
 		glm::vec2 getTargetPosition() const { return m_targetPosition; }
 		glm::vec2 getVelocity() const { return m_velocity; }

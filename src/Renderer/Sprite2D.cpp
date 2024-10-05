@@ -87,22 +87,22 @@ namespace RenderEngine
 		Renderer::draw(m_vertexArray, m_indexBuffer, *m_pShaderProgram);
 	}
 
-	void Sprite2D::setTargetPosition(glm::vec2& targetPosition)
+	void Sprite2D::setTargetPosition(const glm::vec2& targetPosition)
 	{
 		m_targetPosition = targetPosition;
 	}
 
-	void Sprite2D::setPosition(glm::vec2& position)
+	void Sprite2D::setPosition(const glm::vec2& position)
 	{
 		m_position = position;
 	}
 
-	void Sprite2D::addVelocity(glm::vec2& velocity)
+	void Sprite2D::addVelocity(const glm::vec2& velocity)
 	{
 		m_velocity += velocity;
 	}
 
-	void Sprite2D::setSize(glm::vec2& size)
+	void Sprite2D::setSize(const glm::vec2& size)
 	{
 		m_size = size;
 		if (m_size.x <= 1.f) m_size.x = 1;
