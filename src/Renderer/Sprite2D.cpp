@@ -10,7 +10,7 @@
 namespace RenderEngine
 {
 	Sprite2D::Sprite2D(std::shared_ptr<ShaderProgram> pShaderProgram, std::shared_ptr<Texture2D> pTexture, std::string initialSubTexture)
-		: m_pShaderProgram(pShaderProgram), m_pTexture(pTexture)
+		: m_pShaderProgram(pShaderProgram), m_pTexture(pTexture), m_position(glm::vec2(0.0f)), m_targetPosition(m_position), m_velocity(glm::vec2(0.f)), m_size(glm::vec2(1.f))
 	{
 		auto& subTexture = m_pTexture->getSubTexture(initialSubTexture);
 
@@ -85,5 +85,27 @@ namespace RenderEngine
 		m_pTexture->bind();
 
 		Renderer::draw(m_vertexArray, m_indexBuffer, *m_pShaderProgram);
+	}
+
+	void Sprite2D::setTargetPosition(glm::vec2& targetPosition)
+	{
+		m_targetPosition = targetPosition;
+	}
+
+	void Sprite2D::setPosition(glm::vec2& position)
+	{
+		m_position = position;
+	}
+
+	void Sprite2D::addVelocity(glm::vec2& velocity)
+	{
+		m_velocity += velocity;
+	}
+
+	void Sprite2D::setSize(glm::vec2& size)
+	{
+		m_size = size;
+		if (m_size.x <= 1.f) m_size.x = 1;
+		if (m_size.y <= 1.f) m_size.y = 1;
 	}
 }

@@ -32,11 +32,25 @@ namespace RenderEngine
 
 		void render(const glm::vec2& position, const glm::vec2& scale, const int layer, const float rotation) const;
 
+		void setTargetPosition(glm::vec2& targetPosition);
+		void setPosition(glm::vec2& position);
+		void addVelocity(glm::vec2& velocity);
+		void setSize(glm::vec2& size);
+		glm::vec2 getPosition() const { return m_position; }
+		glm::vec2 getTargetPosition() const { return m_targetPosition; }
+		glm::vec2 getVelocity() const { return m_velocity; }
+		glm::vec2 getSize() const { return m_size; }
+
 	private:
 
 		VertexArray m_vertexArray;
 		VertexBuffer m_vertexBuffer;
 		IndexBuffer m_indexBuffer;
+
+		glm::vec2 m_position;
+		glm::vec2 m_targetPosition;
+		glm::vec2 m_velocity;
+		glm::vec2 m_size;
 
 		std::shared_ptr<Texture2D> m_pTexture;
 		std::shared_ptr<ShaderProgram> m_pShaderProgram;

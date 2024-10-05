@@ -1,6 +1,11 @@
 #pragma once
 
+#include <unordered_set>
+#include <memory>
+
 #include <glm/vec2.hpp>
+
+#include "../Renderer/Sprite2D.h"
 
 struct rect
 {
@@ -8,13 +13,20 @@ struct rect
 	glm::vec2 pos2; //right top
 };
 
-bool pointVsRect(const glm::vec2& p, const rect& r)
+class PhysicsEngine
 {
-	return (p.x >= r.pos1.x && p.y >= r.pos1.y && p.x < r.pos2.x && p.y < r.pos2.y);
-}
+public:
 
-bool RectVsRect(const rect& r1, const rect& r2)
-{
-	return (r1.pos1.x < r2.pos2.x && r1.pos2.x > r2.pos1.x &&
-			r1.pos1.y < r2.pos2.y && r1.pos2.y > r2.pos1.y);
-}
+	static void init();
+	static void terminate();
+	static void addDynamicGameObject(std::shared_ptr<RenderEngine::Sprite2D> gameObjectPtr);
+	static void update(double delta);
+
+private:
+
+	static bool RectVsRect(const rect& r1, const rect& r2);
+	static bool pointVsRect(const glm::vec2& p, const rect& r);
+
+	static std::unordered_set<std::shared_ptr<RenderEngine::Sprite2D>> dynamicGameObjects;
+
+};

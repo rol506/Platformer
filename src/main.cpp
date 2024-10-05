@@ -81,12 +81,17 @@ int main(int argc, char** argv)
         auto shader = ResourceManager::loadShaders("SpriteShader", "res/shaders/vSprite.glsl", "res/shaders/fSprite.glsl");
         auto texture = ResourceManager::loadTexture("PlayerTexture", "res/textures/lol.png", GL_LINEAR, GL_REPEAT);
         auto player = ResourceManager::loadSprite("Player", "SpriteShader", "PlayerTexture");
+        auto wall = ResourceManager::loadSprite("Wall", "SpriteShader", "PlayerTexture");
+
+        wall->setTargetPosition(glm::vec2(gWindowSize.x / 2, gWindowSize.y / 2));
 
         glm::mat4 projection = glm::ortho(0.0f, 1.0f * gWindowSize.x, 0.0f, 1.0f * gWindowSize.y, -10.0f, 10.0f);
         shader->use();
         shader->setMat4(projection, "projectionMatrix");
 
-        glm::vec2 playerPosition(gWindowSize / 2);
+        glm::vec2 playerPosition(100,100);
+        player->setPosition(playerPosition);
+        player->setTargetPosition(playerPosition);
 
         //for FPS counter
         double lastTime = glfwGetTime();
@@ -95,6 +100,10 @@ int main(int argc, char** argv)
         //timing
         auto frameLastTime = std::chrono::high_resolution_clock::now();
         double frameDeltaTime = 0.f;
+
+        PhysicsEngine::init();
+        PhysicsEngine::addDynamicGameObject(player);
+        PhysicsEngine::addDynamicGameObject(wall);
 
         RenderEngine::Renderer::setClearColor(0.5f, 1.0f, 1.0f, 1.0f);
         RenderEngine::Renderer::setDepthTest(true);
@@ -121,23 +130,16 @@ int main(int argc, char** argv)
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true); //close when escape pressed
 
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) playerPosition += glm::vec2(0.f, 0.5f * frameDeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) playerPosition += glm::vec2(0.f, -0.5f * frameDeltaTime);
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) playerPosition += glm::vec2(-0.5f * frameDeltaTime, 0.f);
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) playerPosition += glm::vec2(0.5f * frameDeltaTime, 0.f);
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player->addVelocity(glm::vec2(0.f, 0.5f));
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player->addVelocity(glm::vec2(0.f, -0.5f));
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player->addVelocity(glm::vec2(-0.5f, 0.f));
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player->addVelocity(glm::vec2(0.5f, 0.f));
 
             double xpos, ypos;
             glfwGetCursorPos(window, &xpos, &ypos);
             ypos = -(ypos - gWindowSize.y); //invert y position
 
-            if (RectVsRect({ playerPosition, playerPosition + glm::vec2(100.0f) }, { gWindowSize/2, glm::vec2(gWindowSize.x/2, gWindowSize.y/2) + glm::vec2(100.0f)}))
-            {
-                shader->setInt(1, "test");
-            }
-            else
-            {
-                shader->setInt(0, "test");
-            }
+            PhysicsEngine::update(frameDeltaTime);
 
 #pragma endregion
 
@@ -150,22 +152,21 @@ int main(int argc, char** argv)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             shader->setInt(0, "outline");
-            player->render(playerPosition, glm::vec2(1.0f), 0, 0);
+            player->render(player->getPosition(), player->getSize(), 0, 0);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             shader->setInt(1, "outline");
-            player->render(playerPosition, glm::vec2(1.0f), 1, 0);
-
+            player->render(player->getPosition(), player->getSize(), 1, 0);
 
             //draw another rect
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             shader->setInt(0, "outline");
-            player->render(gWindowSize/2, glm::vec2(1.0f), 0, 0);
+            wall->render(wall->getPosition(), wall->getSize(), 0, 0);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             shader->setInt(1, "outline");
-            player->render(gWindowSize/2, glm::vec2(1.0f), 1, 0);
+            wall->render(wall->getPosition(), wall->getSize(), 1, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
@@ -176,6 +177,7 @@ int main(int argc, char** argv)
             glfwPollEvents();
         }
 
+        PhysicsEngine::terminate();
         ResourceManager::unloadAllResources();
         glfwTerminate();
         return 0;
