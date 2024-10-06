@@ -1,28 +1,27 @@
 #version 330 core
 
 in vec2 texCoord;
+in vec2 vertexPos;
 
 uniform sampler2D tex;
 uniform int outline;
-uniform int test;
 
 out vec4 OutColor;
 
 void main()
 {
-	if (outline == 1)
+	float borderWidth = 0.01;
+	
+	if ((vertexPos.x < borderWidth || vertexPos.x >= 1 - borderWidth ||
+		vertexPos.y < borderWidth || vertexPos.y >= 1 - borderWidth) && outline == 1)
 	{
-		OutColor = vec4(0.0, 0.0, 0.0, 1.0);
-	} else {
+		OutColor = vec4(0.0, 1.0, 0.0, 1.0);
+	} else 
+	{
 		OutColor = texture(tex, texCoord);
 	}
 	
-	if (test == 1)
-	{
-		OutColor = vec4(1.0, 0.0, 0.0, 1.0);
-	}
-	
-	if (OutColor.rgb == vec3(0.0) && outline != 1)
+	if (OutColor.rgb == vec3(0.0))
 	{
 		discard;
 	}

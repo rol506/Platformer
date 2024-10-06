@@ -21,6 +21,7 @@ public:
 	static void terminate();
 	static void addDynamicGameObject(std::shared_ptr<RenderEngine::Sprite2D> gameObjectPtr);
 	static void update(double delta);
+	static std::shared_ptr<RenderEngine::Sprite2D> mouseRayCast(const int xpos, const int ypos);
 
 private:
 

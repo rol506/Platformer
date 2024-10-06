@@ -89,9 +89,11 @@ int main(int argc, char** argv)
         shader->use();
         shader->setMat4(projection, "projectionMatrix");
 
-        glm::vec2 playerPosition(100,100);
+        glm::vec2 playerPosition(100,50);
         player->setPosition(playerPosition);
         player->setTargetPosition(playerPosition);
+
+        int outline = 0;
 
         //for FPS counter
         double lastTime = glfwGetTime();
@@ -139,6 +141,17 @@ int main(int argc, char** argv)
             glfwGetCursorPos(window, &xpos, &ypos);
             ypos = -(ypos - gWindowSize.y); //invert y position
 
+            std::shared_ptr<RenderEngine::Sprite2D> rayCastHit = PhysicsEngine::mouseRayCast(xpos, ypos);
+            if (rayCastHit)
+            {
+                shader->use();
+                shader->setInt(1, "outline");
+            }
+            else {
+                shader->use();
+                shader->setInt(0, "outline");
+            }
+
             PhysicsEngine::update(frameDeltaTime);
 
 #pragma endregion
@@ -149,24 +162,11 @@ int main(int argc, char** argv)
 
             RenderEngine::Renderer::clear();
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            shader->setInt(0, "outline");
             player->render(player->getPosition(), player->getSize(), 0, 0);
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            shader->setInt(1, "outline");
-            player->render(player->getPosition(), player->getSize(), 1, 0);
-
             //draw another rect
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            shader->setInt(0, "outline");
             wall->render(wall->getPosition(), wall->getSize(), 0, 0);
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            shader->setInt(1, "outline");
-            wall->render(wall->getPosition(), wall->getSize(), 1, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);

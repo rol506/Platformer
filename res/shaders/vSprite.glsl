@@ -9,10 +9,12 @@ uniform mat4 projectionMatrix;
 uniform float layer;
 
 out vec2 texCoord;
+out vec2 vertexPos;
 
 void main()
 {
 	texCoord = aTexCoord;
 	
 	gl_Position = projectionMatrix * modelMatrix * vec4(vertexPosition, layer, 1.0);
+	vertexPos = vertexPosition;
 }

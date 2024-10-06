@@ -49,6 +49,19 @@ void PhysicsEngine::update(double delta)
 	}
 }
 
+std::shared_ptr<RenderEngine::Sprite2D> PhysicsEngine::mouseRayCast(const int xpos, const int ypos)
+{
+	for (auto& object : dynamicGameObjects)
+	{
+		if (pointVsRect(glm::vec2(xpos, ypos), { object->getPosition(), object->getPosition() + object->getSize() * glm::vec2(100.f) }))
+		{
+			return object;
+		}
+	}
+
+	return nullptr;
+}
+
 void PhysicsEngine::init()
 {
 
