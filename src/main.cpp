@@ -49,6 +49,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -62,7 +63,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
+    //glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -141,7 +142,7 @@ int main(int argc, char** argv)
             glfwGetCursorPos(window, &xpos, &ypos);
             ypos = -(ypos - gWindowSize.y); //invert y position
 
-            std::shared_ptr<RenderEngine::Sprite2D> rayCastHit = PhysicsEngine::mouseRayCast(xpos, ypos);
+            auto rayCastHit = PhysicsEngine::mouseRayCast(xpos, ypos);
             if (rayCastHit)
             {
                 shader->use();
