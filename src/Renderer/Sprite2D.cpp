@@ -21,10 +21,10 @@ namespace RenderEngine
 			// 1 - 2
 
 			//X Y U V
-			0.0f, 0.0f, subTexture.leftBottomUV.x, subTexture.rightTopUV.y,   // 0
-			0.0f, 1.0f, subTexture.leftBottomUV.x, subTexture.leftBottomUV.y, // 1
-			1.0f, 1.0f, subTexture.rightTopUV.x,   subTexture.leftBottomUV.y, // 2
-			1.0f, 0.0f, subTexture.rightTopUV.x,   subTexture.rightTopUV.y    // 3
+			0.00f, 0.00f, subTexture.leftBottomUV.x, subTexture.rightTopUV.y,   // 0
+			0.00f, 0.01f, subTexture.leftBottomUV.x, subTexture.leftBottomUV.y, // 1
+			0.01f, 0.01f, subTexture.rightTopUV.x,   subTexture.leftBottomUV.y, // 2
+			0.01f, 0.00f, subTexture.rightTopUV.x,   subTexture.rightTopUV.y    // 3
 		};
 
 		//const float vertecies[] =

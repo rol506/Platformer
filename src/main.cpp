@@ -94,6 +94,9 @@ int main(int argc, char** argv)
         player->setPosition(playerPosition);
         player->setTargetPosition(playerPosition);
 
+        wall->setSize(glm::vec2(100));
+        player->setSize(glm::vec2(100));
+
         int outline = 0;
 
         //for FPS counter

@@ -10,10 +10,10 @@ out vec4 OutColor;
 
 void main()
 {
-	float borderWidth = 0.01;
+	float borderWidth = 0.0001;
 	
-	if ((vertexPos.x < borderWidth || vertexPos.x >= 1 - borderWidth ||
-		vertexPos.y < borderWidth || vertexPos.y >= 1 - borderWidth) && outline == 1)
+	if ((vertexPos.x < borderWidth || vertexPos.x >= 0.01 - borderWidth ||
+		vertexPos.y < borderWidth || vertexPos.y >= 0.01 - borderWidth) && outline == 1)
 	{
 		OutColor = vec4(0.0, 1.0, 0.0, 1.0);
 	} else 

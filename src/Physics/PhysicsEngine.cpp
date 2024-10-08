@@ -37,8 +37,8 @@ void PhysicsEngine::update(double delta)
 			if (object != currentDynamicObject)
 			{
 				hasCollision = RectVsRect(
-					{ currentDynamicObject->getTargetPosition(), currentDynamicObject->getTargetPosition() + currentDynamicObject->getSize() * glm::vec2(100.f) },
-					{ object->getTargetPosition(), object->getTargetPosition() + object->getSize() * glm::vec2(100.f) });
+					{ currentDynamicObject->getTargetPosition(), currentDynamicObject->getTargetPosition() + currentDynamicObject->getSize() },
+					{ object->getTargetPosition(), object->getTargetPosition() + object->getSize() });
 			}
 		}
 		
@@ -53,7 +53,7 @@ std::shared_ptr<RenderEngine::Sprite2D> PhysicsEngine::mouseRayCast(const int xp
 {
 	for (auto& object : dynamicGameObjects)
 	{
-		if (pointVsRect(glm::vec2(xpos, ypos), { object->getPosition(), object->getPosition() + object->getSize() * glm::vec2(100.f) }))
+		if (pointVsRect(glm::vec2(xpos, ypos), { object->getPosition(), object->getPosition() + object->getSize() }))
 		{
 			return object;
 		}
